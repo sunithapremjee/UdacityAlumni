@@ -2,6 +2,7 @@ package com.google.developer.udacityalumni.activity;
 
 import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
@@ -25,13 +26,14 @@ import com.google.developer.udacityalumni.R;
 import com.google.developer.udacityalumni.adapter.PageAdapter;
 import com.google.developer.udacityalumni.data.AlumContract;
 import com.google.developer.udacityalumni.fragment.ArticleDetailFragment;
+import com.google.developer.udacityalumni.fragment.ArticleFragment;
 
 import java.util.Arrays;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class ArticleDetailActivity extends AppCompatActivity
+public class  ArticleDetailActivity extends AppCompatActivity
         implements ViewPager.OnPageChangeListener, ArticleDetailFragment.DetailArticleCallbacks {
     private static final String LOG_TAG = ArticleDetailActivity.class.getSimpleName();
     private PageAdapter mPageAdapter;
@@ -136,9 +138,26 @@ public class ArticleDetailActivity extends AppCompatActivity
                 }
                 break;
             case R.id.menu_detail_share:
+
                 if (articleId != -1) {
-//                    TODO: Share DYNAMIC link to article
-//                    Will be assigned later
+                    Cursor curCursor = getContentResolver().query(AlumContract.ArticleEntry.buildUriWithId(articleId),
+                            null, null, null,null);
+
+                    if( curCursor != null ) {
+
+                        curCursor.moveToFirst();
+                        String title = curCursor.getString(ArticleFragment.IND_TITLE);
+                        curCursor.close();
+
+                        title = title.toLowerCase();
+                        String url = "https://udacity-alumni-client.herokuapp.com/articles/" + title.replaceAll("\\s", "-");
+
+                        Intent i = new Intent(Intent.ACTION_SEND);
+                        i.setType("text/plain");
+                        i.putExtra(Intent.EXTRA_SUBJECT, title);
+                        i.putExtra(Intent.EXTRA_TEXT, getString(R.string.share, url));
+                        startActivity(Intent.createChooser(i, getString(R.string.choose_to)));
+                    }
                 }
                 break;
         }
