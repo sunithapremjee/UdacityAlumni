@@ -19,5 +19,7 @@
     <!-- Sliding View -->
     <dimen name="sliding_view_avatar_size">48dp</dimen>
     <dimen name="widget_margin">8dp</dimen>
+    <dimen name="widget_name_textsize">12dp</dimen>
+    <dimen name="widget_role_textsize">10dp</dimen>
 
 </resources>
