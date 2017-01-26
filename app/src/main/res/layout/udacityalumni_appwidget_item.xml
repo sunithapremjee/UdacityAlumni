@@ -6,22 +6,22 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:padding="8dp">
     <TextView
-        android:id="@+id/Alumni_Title"
+        android:id="@+id/Alumni_Name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="12sp"
         android:textStyle="bold"
-        android:text="Hello World"
+        android:text=""
         android:textColor="@color/background_floating_material_dark"
         xmlns:android="http://schemas.android.com/apk/res/android" />
 
     <TextView
-        android:id="@+id/Alumni_Article_Title"
+        android:id="@+id/Alumni_Role"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="10sp"
         android:textStyle="italic"
-        android:text="Hello World"
+        android:text=""
         android:textColor="@color/background_floating_material_dark"
         xmlns:android="http://schemas.android.com/apk/res/android" />
 

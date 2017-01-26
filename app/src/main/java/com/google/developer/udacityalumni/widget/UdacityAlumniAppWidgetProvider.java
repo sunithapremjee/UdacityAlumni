@@ -7,44 +7,33 @@ import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.util.Log;
 import android.widget.RemoteViews;
 
 import com.google.developer.udacityalumni.R;
 import com.google.developer.udacityalumni.activity.MainActivity;
 
-/**
- * Created by Sunitha Premjee on 1/25/2017.
- */
+
 
 public class UdacityAlumniAppWidgetProvider extends AppWidgetProvider {
 
 
-    public static final String TAG = "UdacityAlumniAppWidgetProvider";
+    public static final String TAG = "AlumniAppWidgetProvider";
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
 
-        // Log.d(LOG_TAG, "onUpdate");
+         Log.d(TAG, "onUpdate");
 
 
-        for (int i = 0; i < appWidgetIds.length; i++) {
+        for (int appWidgetId: appWidgetIds ) {
 
-            updateAppWidget(context, appWidgetManager, appWidgetIds[i]);
+            updateAppWidget(context, appWidgetManager, appWidgetId );
 
         }
         appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.widget_list);
     }
 
-
-    @Override
-    public void onEnabled(Context context) {
-        // Enter relevant functionality for when the first widget is created
-    }
-
-    @Override
-    public void onDisabled(Context context) {
-        // Enter relevant functionality for when the last widget is disabled
-    }
 
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
                                 int appWidgetId) {

@@ -12,11 +12,7 @@ import android.widget.RemoteViewsService;
 
 import com.google.developer.udacityalumni.R;
 import com.google.developer.udacityalumni.data.AlumContract;
-import com.google.developer.udacityalumni.fragment.ArticleFragment;
 
-/**
- * Created by Sunitha Premjee on 1/25/2017.
- */
 
 
 public class UdacityAlumniWidgetService extends RemoteViewsService {
@@ -25,13 +21,13 @@ public class UdacityAlumniWidgetService extends RemoteViewsService {
     public static final String TAG = "UAlumniWidgetService";
 
     @Override
-    public RemoteViewsFactory onGetViewFactory(Intent intent) {
+    public RemoteViewsFactory onGetViewFactory( Intent intent ) {
 
         Log.i(TAG, "UdacityAlumniWidgetService");
-        return new UdacityAlumniRemoteViewsFactory(this.getApplicationContext(), intent);
+        return new UdacityAlumniRemoteViewsFactory( this.getApplicationContext(), intent );
     }
 
-    class UdacityAlumniRemoteViewsFactory implements
+    private class UdacityAlumniRemoteViewsFactory implements
             RemoteViewsService.RemoteViewsFactory {
 
 
@@ -40,9 +36,20 @@ public class UdacityAlumniWidgetService extends RemoteViewsService {
         private Context mContext;
         private int mAppWidgetId;
 
-        public UdacityAlumniRemoteViewsFactory(Context context, Intent intent) {
+        private static final int IND_USER_ID = 0;
+        private static final int IND_EMAIL = 1;
+        private static final int IND_CREATED_AT = 2;
+        private static final int IND_UPDATED_AT = 3;
+        private static final int IND_NAME = 4;
+        private static final int IND_AVATAR = 5;
+        private static final int IND_ROLE = 6;
+        private static final int IND_BIO = 7;
+        private static final int IND_PUBLIC =8;
 
-            Log.i(TAG, "UdacityAlumniRemoteViewsFactory");
+        private UdacityAlumniRemoteViewsFactory(Context context, Intent intent) {
+
+            Log.i( TAG, "UdacityAlumniRemoteViewsFactory" );
+
             mContext = context;
             mAppWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,
                     AppWidgetManager.INVALID_APPWIDGET_ID);
@@ -51,12 +58,12 @@ public class UdacityAlumniWidgetService extends RemoteViewsService {
         // Initialize the data set.
         public void onCreate() {
 
-            mCursor = getContentResolver().query(AlumContract.ArticleEntry.CONTENT_URI, null, null, null, null);
+            mCursor = getContentResolver().query(AlumContract.UserEntry.CONTENT_URI, null, null, null, null);
         }
 
         @Override
         public void onDataSetChanged() {
-            mCursor = getContentResolver().query(AlumContract.ArticleEntry.CONTENT_URI, null, null, null, AlumContract.ArticleEntry.COL_ARTICLE_ID + " desc");
+            mCursor = getContentResolver().query(AlumContract.UserEntry.CONTENT_URI, null, null, null, AlumContract.UserEntry.COL_USER_ID + " desc");
 
         }
 
@@ -86,11 +93,11 @@ public class UdacityAlumniWidgetService extends RemoteViewsService {
                 return null;
             RemoteViews remoteViews = new RemoteViews(mContext.getPackageName(), R.layout.udacityalumni_appwidget_item );
             if( mCursor.moveToPosition(position) ) {
-                Log.i(TAG, mCursor.getString(ArticleFragment.IND_TITLE));
-                remoteViews.setTextViewText(R.id.Alumni_Title,mCursor.getString(ArticleFragment.IND_USER_NAME ));
+                Log.i(TAG, mCursor.getString(IND_NAME));
+                remoteViews.setTextViewText(R.id.Alumni_Name,mCursor.getString(IND_NAME));
 
 
-                remoteViews.setTextViewText(R.id.Alumni_Article_Title,mCursor.getString(ArticleFragment.IND_TITLE));
+                remoteViews.setTextViewText(R.id.Alumni_Role,mCursor.getString(IND_ROLE));
             }
             return remoteViews;
         }
@@ -109,7 +116,7 @@ public class UdacityAlumniWidgetService extends RemoteViewsService {
         public long getItemId(int position) {
             if( mCursor.moveToPosition(position) ){
 
-                return mCursor.getLong( ArticleFragment.IND_ARTICLE_ID );
+                return mCursor.getLong( IND_USER_ID );
             }
             return 0;
         }
