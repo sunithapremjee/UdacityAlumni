@@ -6,6 +6,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.graphics.drawable.VectorDrawableCompat;
@@ -19,7 +20,6 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -34,6 +34,7 @@ import com.google.developer.udacityalumni.adapter.PageAdapter;
 import com.google.developer.udacityalumni.data.AlumContract;
 import com.google.developer.udacityalumni.fragment.ArticleFragment;
 import com.google.developer.udacityalumni.fragment.PlaceholderFragment;
+import com.google.developer.udacityalumni.fragment.PostFragment;
 import com.google.developer.udacityalumni.service.AlumIntentService;
 import com.google.developer.udacityalumni.service.NavMenuServiceConnection;
 import com.google.developer.udacityalumni.utility.Utility;
@@ -50,7 +51,8 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MainActivity extends BaseActivity implements ArticleFragment.ArticleCallback,
         LoaderManager.LoaderCallbacks<Cursor>, TabLayout.OnTabSelectedListener,
-        NavigationView.OnNavigationItemSelectedListener, BottomNavigationView.OnNavigationItemSelectedListener {
+        NavigationView.OnNavigationItemSelectedListener, BottomNavigationView.OnNavigationItemSelectedListener,
+        View.OnClickListener{
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
@@ -58,7 +60,6 @@ public class MainActivity extends BaseActivity implements ArticleFragment.Articl
     private List<Integer> mBookmarks;
     private List<String> mTags;
     private static final int LOADER = 101;
-    private String mTitle;
 
     private NavMenuServiceConnection mNavMenuCustomTabs;
 
@@ -72,9 +73,10 @@ public class MainActivity extends BaseActivity implements ArticleFragment.Articl
     ViewPager mViewPager;
     @BindView(R.id.nav_view)
     NavigationView mNavView;
-    TabLayout.Tab mArticleTab, mCareersTab, mMentorshipTab, mMeetUpsTab;
     @BindView(R.id.nav_bottom)
-    BottomNavigationView mBottomNav;
+    BottomNavigationView mBottomNv;
+    @BindView(R.id.main_fab)
+    FloatingActionButton mFab;
 
 
     @Override
@@ -100,57 +102,42 @@ public class MainActivity extends BaseActivity implements ArticleFragment.Articl
             } else {
                 cv.setImageResource(R.drawable.ic_person);
             }
-
-            if (mToolbar != null && savedInstanceState != null)
-                mToolbar.setTitle(mTitle);
             if (mToolbar != null) {
                 Drawable overflowIcon = mToolbar.getOverflowIcon();
                 if (overflowIcon != null)
                     overflowIcon.setTint(ContextCompat.getColor(this, R.color.colorAccent));
-                if (savedInstanceState != null) mToolbar.setTitle(mTitle);
             }
             setSupportActionBar(mToolbar);
             setupViewPager(mViewPager);
             mTabs.setupWithViewPager(mViewPager);
-            setUpTabs();
             ActionBar supportActionBar = getSupportActionBar();
             if (supportActionBar != null) {
                 VectorDrawableCompat indicator
                         = VectorDrawableCompat.create(getResources(), R.drawable.ic_menu, getTheme());
                 assert indicator != null;
                 indicator.setTint(ResourcesCompat.getColor(getResources(), R.color.colorAccent, getTheme()));
-
                 supportActionBar.setHomeAsUpIndicator(indicator);
                 supportActionBar.setDisplayHomeAsUpEnabled(true);
             }
             mNavView.setNavigationItemSelectedListener(this);
-            mBottomNav.setOnNavigationItemSelectedListener(this);
-            mBottomNav.setVisibility((mViewPager.getCurrentItem()==1)?View.VISIBLE:View.GONE);
-
+            mBottomNv.setOnNavigationItemSelectedListener(this);
+            mBottomNv.setVisibility((mViewPager.getCurrentItem()==1)?View.VISIBLE:View.GONE);
             mNavMenuCustomTabs = new NavMenuServiceConnection(this);
+            mFab.setOnClickListener(this);
         }
 
     }
 
     private void setupViewPager(ViewPager viewPager) {
         PageAdapter mPageAdapter = new PageAdapter(getSupportFragmentManager());
-        mPageAdapter.addFragment(new ArticleFragment());
-        mPageAdapter.addFragment(new PlaceholderFragment());
-        mPageAdapter.addFragment(new PlaceholderFragment());
-        mPageAdapter.addFragment(new PlaceholderFragment());
+        mPageAdapter.addFragment(new PostFragment(), getString(R.string.home));
+        mPageAdapter.addFragment(new PlaceholderFragment(), getString(R.string.apps));
+        mPageAdapter.addFragment(new ArticleFragment(), getString(R.string.articles));
+        mPageAdapter.addFragment(new PlaceholderFragment(), getString(R.string.community));
         viewPager.setAdapter(mPageAdapter);
     }
 
-    private void setUpTabs() {
-        mArticleTab = mTabs.getTabAt(0);
-        mCareersTab = mTabs.getTabAt(1);
-        mMentorshipTab = mTabs.getTabAt(2);
-        mMeetUpsTab = mTabs.getTabAt(3);
-        mArticleTab.setIcon(R.drawable.ic_home);
-        mCareersTab.setIcon(R.drawable.ic_apps);
-        mMentorshipTab.setIcon(R.drawable.ic_mentorship);
-        mMeetUpsTab.setIcon(R.drawable.ic_meetups);
-    }
+
 
     @Override
     protected void onStart() {
@@ -216,7 +203,6 @@ public class MainActivity extends BaseActivity implements ArticleFragment.Articl
     }
 
 
-
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         return new CursorLoader(this, AlumContract.ArticleEntry.CONTENT_URI,
@@ -276,45 +262,17 @@ public class MainActivity extends BaseActivity implements ArticleFragment.Articl
 
     @Override
     public void onTabSelected(TabLayout.Tab tab) {
-        Drawable icon = tab.getIcon();
-        assert icon != null;
-        icon.setTint(ContextCompat.getColor(MainActivity.this, R.color.colorAccent));
         int pos = tab.getPosition();
-        switch (pos) {
-            case 0:
-                mTitle = getString(R.string.home);
-                break;
-            case 1:
-                mTitle = getString(R.string.apps);
-                break;
-            case 2:
-                mTitle = getString(R.string.mentorship);
-                break;
-            case 3:
-                mTitle = getString(R.string.meetups);
-                break;
-            default:
-                Log.e(LOG_TAG, "TAB POSITION UNRECOGINIZED");
-        }
-        mBottomNav.setVisibility(pos == 1 ? View.VISIBLE : View.GONE);
-        if (mTitle != null) setTitle(mTitle);
+        mBottomNv.setVisibility(pos == 1 ? View.VISIBLE : View.GONE);
+
     }
 
     @Override
     public void onTabUnselected(TabLayout.Tab tab) {
-        Drawable icon = tab.getIcon();
-        assert icon != null;
-        icon.setTint(ContextCompat.getColor(MainActivity.this, R.color.unselected_icon_dark));
     }
 
     @Override
     public void onTabReselected(TabLayout.Tab tab) {
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putString(getString(R.string.title_key), mTitle);
     }
 
     @Override
@@ -324,5 +282,14 @@ public class MainActivity extends BaseActivity implements ArticleFragment.Articl
             getSupportLoaderManager().destroyLoader(loader.getId());
         }
         super.onPause();
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (mTabs == null || mTabs.getTabCount() == 0) return;
+        switch(mTabs.getSelectedTabPosition()){
+            case 0:                 //home frag
+                startActivity(new Intent(MainActivity.this, NewPostActivity.class));
+        }
     }
 }
