@@ -4,18 +4,18 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
 
-    <!-- To auto-complete the email text field in the login form with the userName's emails -->
+    <!-- To auto-complete the email text field in the login form with the user's emails -->
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.READ_PROFILE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
 
     <application xmlns:tools="http://schemas.android.com/tools"
+        tools:replace="android:supportsRtl"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        tools:replace="android:supportsRtl">
+        android:theme="@style/AppTheme">
         <activity
             android:name=".activity.SplashActivity"
             android:theme="@style/SplashTheme">
@@ -38,7 +38,7 @@
             android:name=".data.AlumContentProvider"
             android:authorities="com.google.developer.udacityalumni"
             android:enabled="true"
-            android:exported="false" />
+            android:exported="true" />
 
         <service
             android:name=".service.AlumIntentService"
@@ -63,16 +63,20 @@
         <activity
             android:name=".activity.LoginActivity"
             android:label="@string/title_activity_login" />
-        <activity
-            android:name=".activity.NewPostActivity"
-            android:label="@string/title_activity_new_post"
-            android:theme="@style/AppTheme"
-            android:parentActivityName=".activity.MainActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activity.MainActivity"/>
-        </activity>
 
+        <receiver android:name=".widget.UdacityAlumniAppWidgetProvider" >
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider"
+                android:resource="@xml/udacityalumni_appwidget_info" />
+        </receiver>
+
+        <service
+            android:name=".widget.UdacityAlumniWidgetService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_REMOTEVIEWS"/>
     </application>
 
 </manifest>

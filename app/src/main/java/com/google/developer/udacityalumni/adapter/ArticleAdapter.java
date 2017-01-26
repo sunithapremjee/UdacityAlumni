@@ -1,6 +1,8 @@
 package com.google.developer.udacityalumni.adapter;
 
+import android.appwidget.AppWidgetManager;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -90,7 +92,16 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ArticleV
 
         //Animation on Article
         AnimationUtils.scaleXY(holder);
+        updateWidgets(mContext);
 
+    }
+
+    public static void updateWidgets(Context context) {
+
+        // Setting the package ensures that only components in our app will receive the broadcast
+        Intent dataUpdatedIntent = new Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE)
+                .setPackage(context.getPackageName());
+        context.sendBroadcast(dataUpdatedIntent);
     }
 
     public void swapCursor(Cursor cursor) {

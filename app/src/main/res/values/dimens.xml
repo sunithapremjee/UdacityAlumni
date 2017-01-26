@@ -18,5 +18,6 @@
 
     <!-- Sliding View -->
     <dimen name="sliding_view_avatar_size">48dp</dimen>
+    <dimen name="widget_margin">8dp</dimen>
 
 </resources>
